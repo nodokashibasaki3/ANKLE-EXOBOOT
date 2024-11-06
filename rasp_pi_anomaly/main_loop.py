@@ -26,6 +26,7 @@ config, offline_test_time_duration, past_data_file_names = config_util.load_conf
 
 IS_HARDWARE_CONNECTED = config.IS_HARDWARE_CONNECTED
 offline_data_left, offline_data_right = None, None
+
 if not IS_HARDWARE_CONNECTED:
     offline_data_left, offline_data_right = offline_testing_file.get_offline_past_data_files(config.IS_HARDWARE_CONNECTED, past_data_file_names, offline_test_time_duration)
 

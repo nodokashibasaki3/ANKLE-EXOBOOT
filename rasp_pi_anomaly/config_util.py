@@ -176,15 +176,18 @@ def load_config(config_filename, offline_value, hardware_connected) -> tuple[any
         raise ValueError(error_str)
     config = module.config
     
-    if hardware_connected == 'True':
-        config.IS_HARDWARE_CONNECTED = True
-    elif hardware_connected == 'False':
-        config.IS_HARDWARE_CONNECTED = False
-    else: 
-        print('Hardware Connection Status not interpretable.')
-        quit()
-    print('Using ConfigurableConstants from: ', config_filename)
-    print(f"Loaded configuration: {config}")
+    print(f"HARDWARECONNECTED {config.IS_HARDWARE_CONNECTED}")
+
+    if config.IS_HARDWARE_CONNECTED:
+        if hardware_connected == 'True':
+            config.IS_HARDWARE_CONNECTED = True
+        elif hardware_connected == 'False':
+            config.IS_HARDWARE_CONNECTED = False
+        else: 
+            print('Hardware Connection Status not interpretable.')
+            quit()
+        print('Using ConfigurableConstants from: ', config_filename)
+        print(f"Loaded configuration: {config}")
 
     if offline_value:
         try:
@@ -241,28 +244,9 @@ def parse_args():
 
 
 ##CHANGES: depending on the online/offline mode it chooses which config to load##
-def load_config_from_args():
-    args = parse_args()
-
-    if args.config.lower() == "offline":
-        config_file = "offline_config"
-    else:
-        config_file = "online_config"
-
-    config, offline_test_time_duration = load_config(
-        config_filename=config_file,
-        offline_value=args.offlinetesttime,
-        hardware_connected=args.hardwareconnected
-    )
-    
-    print(f"Selected config file: {config_file}")
-
-    return config, offline_test_time_duration, args.past_data_file_names
-
 # def load_config_from_args():
 #     args = parse_args()
 
-#     # Determine which config file to use
 #     if args.config.lower() == "offline":
 #         config_file = "offline_config"
 #     else:
@@ -273,22 +257,24 @@ def load_config_from_args():
 #         offline_value=args.offlinetesttime,
 #         hardware_connected=args.hardwareconnected
 #     )
-
-#     #  determining which control muxer to load
-#     if args.controlmuxer.lower() == "control_muxer_jayston":
-#         control_muxer = importlib.import_module('control_muxer_Jayston')
-#     else:
-#         control_muxer = importlib.import_module('control_muxer')
-
+    
 #     print(f"Selected config file: {config_file}")
-#     print(f"Selected control muxer: {args.controlmuxer}")
 
-#     return config, offline_test_time_duration, args.past_data_file_names, control_muxer
+#     return config, offline_test_time_duration, args.past_data_file_names
+
+def load_config_from_args():
+    args = parse_args()
+    config, offline_test_time_duration = load_config(
+        config_filename=args.config, 
+        offline_value=args.offlinetesttime,
+        hardware_connected=args.hardwareconnected, 
+    )
+    return config, offline_test_time_duration, args.past_data_file_names
 
 def get_sync_detector(config):
     if config.IS_HARDWARE_CONNECTED and (platform.system() == "Linux" and "arm" in platform.machine()):
         try:
-            sync_detector = InputDevice(pin=config.SYNC_PIN)
+            sync_detector = InputDevice(pin=constants.SYNC_PIN)
             return sync_detector
         except BadPinFactory as e:
             print(f"Error initializing gpiozero: {e}")
