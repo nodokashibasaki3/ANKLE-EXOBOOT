@@ -157,7 +157,9 @@ class ConfigSaver():
             self.my_file.close()
 
 
-def load_config(config_filename, offline_value, hardware_connected) -> tuple[any, any]:
+from typing import Any, Tuple
+
+def load_config(config_filename, offline_value, hardware_connected) -> Tuple[Any, Any]:
     
     try:
         # strip extra parts off
